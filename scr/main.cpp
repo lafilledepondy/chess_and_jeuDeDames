@@ -28,7 +28,7 @@ White move:
 
 int main() {
   std::cout << "+==============================================================+" << std::endl;
-  std::cout << "|                          CHATURANGA                          |" << std::endl;
+  std::cout << "|                       CHESS & CHECKERS                       |" << std::endl;
   std::cout << "+==============================================================+" << std::endl;
 
 

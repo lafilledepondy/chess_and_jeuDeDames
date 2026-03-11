@@ -3,13 +3,15 @@
 #include "position.hpp"
 #include "plateau.hpp"
 
+class Plateau;
+
 class Piece {
     private:
         // ----------------------------------------------------------------------------
         // private attribute
         // ----------------------------------------------------------------------------    
-        const std::string _name;
-        const bool _isBlack;
+        std::string _name;
+        bool _isBlack;
 
     public:
         // ----------------------------------------------------------------------------
@@ -21,7 +23,7 @@ class Piece {
         // ----------------------------------------------------------------------------
         // abstract methods
         // ---------------------------------------------------------------------------- 
-        virtual bool isValidMove(Position &start_p, Position &end_p, Position &capture_p, Plateau* plateau) = 0;
+        virtual bool isValidMove(const Position &start_pos, const Position &end_pos, const Position &capture_pos, Plateau* plateau) = 0;
 
         // ----------------------------------------------------------------------------
         // methods
