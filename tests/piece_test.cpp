@@ -20,23 +20,6 @@ public:
     }
 };
 
-class TestPieceExceptOne : public Piece {
-public:
-    TestPieceExceptOne(bool color, const std::string& name)
-        : Piece(color, name) {}
-
-    bool isValidMove(const Position& start,
-                     const Position& end,
-                     bool,
-                     Plateau*) const override {
-
-        if (end.getX() == 3 && end.getY() == 3)
-            return false;
-
-        return true;
-    }
-};
-
 TEST(PieceTest, BlackPiece) {
     TestPiece piece_1(true, "pawn");
     TestPiece piece_2(false, "pawn");
@@ -67,18 +50,7 @@ TEST(PieceTest, GetValidMovesAll) {
 
     Position start(1,1);
 
-    auto moves = piece.getValidMoves(start, &board);
+    std::vector<Position> moves = piece.getValidMoves(start, &board);
 
     EXPECT_EQ(moves.size(), 63);
 }
-
-// TEST(PieceTest, GetValidMovesAllExceptOne) {
-//     TestPieceExceptOne piece(true, "pawn");
-//     TestPlateau board(8,8);
-
-//     Position start(0,0);
-
-//     auto moves = piece.getValidMoves(start, &board);
-
-//     EXPECT_EQ(moves.size(), 63);
-// }
