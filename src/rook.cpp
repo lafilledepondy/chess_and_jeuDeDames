@@ -9,6 +9,7 @@ bool Rook::isValidMove(const Position &start_pos, const Position &end_pos, bool 
     int dy = abs(end_pos.getY() - start_pos.getY());
     Piece* target = board->getPiece(end_pos);
 
+    // no move
     if (dx == 0 && dy == 0) return false;
 
     // straight line

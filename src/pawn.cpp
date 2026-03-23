@@ -8,6 +8,9 @@ bool Pawn::isValidMove(const Position &start_pos, const Position &end_pos, bool 
     const int dy = end_pos.getY() - start_pos.getY();
     Piece* target = board->getPiece(end_pos);
     
+    // no move
+    if (dx == 0 && dy == 0) return false;
+
     // forward
     if (dx == 0) {
         // cannot move forward into a piece
