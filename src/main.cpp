@@ -17,7 +17,7 @@ void chessMain() {
 
     while (true) {
         // std::cout << cb.toString() << std::endl;
-
+        std::cout << cb.toUnicodeString() << std::endl;
         std::cout << (turnBlack ? "Black" : "White") << " move: \n> ";
         std::getline(std::cin, input);
 
@@ -60,16 +60,15 @@ int main() {
     std::cout << "|                       CHESS & CHECKERS                       |" << std::endl;
     std::cout << "+==============================================================+" << std::endl;
 
-    // chessMain();
+    chessMain();
 
-    Checkerboard cb;
+    // Checkerboard cb;
 
-    cb.initialConditions();
-    cb.play(Position("A2"), Position("A4"), true);
-    cb.play(Position("B1"), Position("C3"), true);
+    // cb.initialConditions();
+    // cb.play(Position("A2"), Position("A4"), true);
     
     // std::cout << cb.toString() << std::endl;
-    std::cout << cb.toUnicodeString() << std::endl;
+    // std::cout << cb.toUnicodeString() << std::endl;
 
     return 0;
 }
