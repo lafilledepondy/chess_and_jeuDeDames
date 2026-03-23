@@ -9,60 +9,64 @@
 #include "checkerboard.hpp"
 
 void chessMain() {
-  Checkerboard cb;
-  cb.initialConditions();
+    Checkerboard cb;
+    cb.initialConditions();
 
-  std::string input;
-  bool turnBlack = false; // white starts
+    std::string input;
+    bool turnBlack = false; // white starts
 
-  while (true) {
-      std::cout << cb.toString() << std::endl;
-      std::cout << (turnBlack ? "Black" : "White") << " move: \n> ";
-      std::getline(std::cin, input);
+    while (true) {
+        std::cout << cb.toString() << std::endl;
+        std::cout << (turnBlack ? "Black" : "White") << " move: \n> ";
+        std::getline(std::cin, input);
 
-      if (input == "quit") {
-          break;
-      }
+        if (input == "quit") {
+            break;
+        }
 
-      std::istringstream iss(input);
-      std::string startStr, endStr;
+        std::istringstream iss(input);
+        std::string startStr, endStr;
 
-      if (!(iss >> startStr >> endStr)) {
-          std::cout << "Invalid format. Use: `D6 D4`\n";
-          continue;
-      }
+        if (!(iss >> startStr >> endStr)) {
+            std::cout << "Invalid format. Use: `D6 D4`\n";
+            continue;
+        }
 
-      try {
-          Position start(startStr);
-          Position end(endStr);
+        try {
+            Position start(startStr);
+            Position end(endStr);
 
-          cb.play(start, end, turnBlack);
-          turnBlack = !turnBlack; // switch player
-          // spacing from the previous player
-          for(int i = 0; i < 3; ++i) {
-              std::cout << "\n";
-          }
-      }
-      catch (const std::exception& e) {
-          std::cout << "Invalid move: " << e.what() << std::endl;
-      }
-  }
+            cb.play(start, end, turnBlack);
+            turnBlack = !turnBlack; // switch player
+            // spacing from the previous player
+            for(int i = 0; i < 3; ++i) {
+                std::cout << "\n";
+            }
+        }
+        catch (const std::exception& e) {
+            std::cout << "Invalid move: " << e.what() << std::endl;
+        }
+    }
 }
 
 
 int main() {
-  std::cout << "+==============================================================+" << std::endl;
-  std::cout << "|                       CHESS & CHECKERS                       |" << std::endl;
-  std::cout << "+==============================================================+" << std::endl;
 
-  chessMain();
+    for(int i = 0; i < 100; ++i) {
+        std::cout << "\n";
+    }    
+    std::cout << "+==============================================================+" << std::endl;
+    std::cout << "|                       CHESS & CHECKERS                       |" << std::endl;
+    std::cout << "+==============================================================+" << std::endl;
 
-  // Checkerboard cb;
+    chessMain();
 
-  // cb.initialConditions();
+    // Checkerboard cb;
 
-  // std::cout << cb.toString() << std::endl;
-  
+    // cb.initialConditions();
 
-  return 0;
+    // std::cout << cb.toString() << std::endl;
+    
+
+     return 0;
 }

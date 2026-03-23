@@ -18,8 +18,6 @@ y ^
 Checkerboard::Checkerboard():Plateau(8, 8) {}
        
 void Checkerboard::initialConditions() { 
-    // TODO 
-
     // PAWN    
     // ---black
     addPiece(new Pawn(true), Position(1, 2));
