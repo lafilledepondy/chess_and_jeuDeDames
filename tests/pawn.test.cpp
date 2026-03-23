@@ -3,8 +3,7 @@
 #include "exception.hpp"
 #include "checkerboard.hpp"
 
-// Helper to setup a mid-game board
-Checkerboard setupBoard() {
+Checkerboard setupPawnBoard() {
     Checkerboard cb;
     cb.initialConditions();
 
@@ -26,7 +25,7 @@ Checkerboard setupBoard() {
 }
  
 TEST(PawnTest, DoubleStepAfterMoveThrows) {
-    Checkerboard cb = setupBoard();
+    Checkerboard cb = setupPawnBoard();
 
     EXPECT_THROW(
         cb.play(Position("B5"), Position("B3"), false),
@@ -35,7 +34,7 @@ TEST(PawnTest, DoubleStepAfterMoveThrows) {
 } 
 
 TEST(PawnTest, ValidForwardMove) {
-    Checkerboard cb = setupBoard();
+    Checkerboard cb = setupPawnBoard();
 
     EXPECT_NO_THROW(
         cb.play(Position("B3"), Position("B4"), true)
@@ -43,7 +42,7 @@ TEST(PawnTest, ValidForwardMove) {
 }
 
 TEST(PawnTest, PiecesMovedCorrectly) {
-    Checkerboard cb = setupBoard();
+    Checkerboard cb = setupPawnBoard();
 
     EXPECT_EQ(cb.getPiece(Position("B7")), nullptr);
     EXPECT_EQ(cb.getPiece(Position("B2")), nullptr);
@@ -53,7 +52,7 @@ TEST(PawnTest, PiecesMovedCorrectly) {
 }
 
 TEST(PawnTest, ValidDiagonalCapture) {
-    Checkerboard cb = setupBoard();
+    Checkerboard cb = setupPawnBoard();
 
     EXPECT_NO_THROW(
         cb.play(Position("B5"), Position("C4"), false)
@@ -86,7 +85,7 @@ TEST(PawnTest, InvalidBackwardMove) {
 }
 
 TEST(PawnTest, ForwardBlockedThrows) {
-    Checkerboard cb = setupBoard();
+    Checkerboard cb = setupPawnBoard();
     cb.play(Position("B3"), Position("B4"), true);
 
     EXPECT_THROW(

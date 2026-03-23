@@ -59,14 +59,15 @@ int main() {
     std::cout << "|                       CHESS & CHECKERS                       |" << std::endl;
     std::cout << "+==============================================================+" << std::endl;
 
-    chessMain();
+    // chessMain();
 
-    // Checkerboard cb;
+    Checkerboard cb;
 
-    // cb.initialConditions();
-
-    // std::cout << cb.toString() << std::endl;
+    cb.initialConditions();
+    cb.play(Position("A2"), Position("A4"), true);
+    cb.play(Position("B1"), Position("C3"), true);
     
+    std::cout << cb.toString() << std::endl;
 
-     return 0;
+    return 0;
 }
