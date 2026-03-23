@@ -1,12 +1,9 @@
-// ==============================================================================
-// QUEEN : 
-// ==============================================================================
-
 #pragma once
 
-#include "piece.hpp"
+#include "rook.hpp"
+#include "bishop.hpp"
 
-class Queen: public Piece {
+class Queen : public Rook, public Bishop {
     public:
         // ----------------------------------------------------------------------------
         // constructors
