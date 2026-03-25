@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <fstream>
+#include <sstream>
 #include <vector>
 
 namespace {
@@ -206,7 +207,8 @@ void Checkerboard::saveToFile(const std::string& filename) const {
         history.pop();
     }
 
-    auto toAlgebraic = [](const Position& pos) {
+    // lambda function strPosition converts Position to E2, D4
+    auto strPosition = [](const Position& pos) {
         std::string s = pos.toString();
         if (s.size() >= 2 && s.front() == '[' && s.back() == ']') {
             s = s.substr(1, s.size() - 2);
@@ -214,12 +216,23 @@ void Checkerboard::saveToFile(const std::string& filename) const {
         return s;
     };
 
-    // write as: WHITE,E2,E4
+    // lambda function pieceName casting
+    auto pieceName = [](const Piece* piece) -> std::string {
+        if (dynamic_cast<const Pawn*>(piece) != nullptr) return "PAWN";
+        if (dynamic_cast<const Rook*>(piece) != nullptr) return "ROOK";
+        if (dynamic_cast<const Cavalier*>(piece) != nullptr) return "CAVALIER";
+        if (dynamic_cast<const Bishop*>(piece) != nullptr) return "BISHOP";
+        if (dynamic_cast<const Queen*>(piece) != nullptr) return "QUEEN";
+        if (dynamic_cast<const King*>(piece) != nullptr) return "KING";
+        return "UNKNOWN";
+    };
+
+    // write like WHITE,PAWN,E2,E4
     for (auto it = temp.rbegin(); it != temp.rend(); ++it) {
         file << (it->turnBlack ? "BLACK" : "WHITE") << ","
-             << toAlgebraic(it->from) << ","
-             << toAlgebraic(it->to)
-             << "\n";
+            << pieceName(it->movedPiece) << ","
+            << strPosition(it->from) << ","
+            << strPosition(it->to) << "\n";
     }
 }
 
@@ -229,7 +242,7 @@ void Checkerboard::loadFromFile(const std::string& filename) {
         return;
     }
 
-    std::string turn, from, to;
+    std::string line;
 
     // trim removes trailing whitespace 
     // add carriage return characters
@@ -239,17 +252,36 @@ void Checkerboard::loadFromFile(const std::string& filename) {
         }
     };
 
-    while (std::getline(file, turn, ',')) {
-        if (!std::getline(file, from, ',')) {
-            break;
-        }
-        if (!std::getline(file, to)) {
-            break;
+    while (std::getline(file, line)) {
+        trim(line);
+        if (line.empty()) {
+            continue;
         }
 
-        trim(turn);
-        trim(from);
-        trim(to);
+        std::istringstream iss(line);
+        std::vector<std::string> fields;
+        std::string field;
+
+        while (std::getline(iss, field, ',')) {
+            trim(field);
+            fields.push_back(field);
+        }
+
+        std::string turn;
+        std::string from;
+        std::string to;
+
+        if (fields.size() == 3) {
+            turn = fields[0];
+            from = fields[1];
+            to = fields[2];
+        } else if (fields.size() == 4) {
+            turn = fields[0];
+            from = fields[2];
+            to = fields[3];
+        } else {
+            continue;
+        }
 
         if (turn.empty() || from.empty() || to.empty()) {
             continue;

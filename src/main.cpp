@@ -100,7 +100,7 @@ int main() {
     std::cout << "+==============================================================+" << std::endl;
 
     // chessMain();
-    // demoSaveAndLoad();
+    demoSaveAndLoad();
 
     // Checkerboard cb;
 
