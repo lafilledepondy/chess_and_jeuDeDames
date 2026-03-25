@@ -1,6 +1,8 @@
 #include "checkerboard.hpp"
 
 #include <cmath>
+#include <fstream>
+#include <vector>
 
 namespace {
 bool getFirstMoveFlag(const Piece* piece) {
@@ -187,4 +189,44 @@ std::string Checkerboard::toUnicodeString() const {
     }
     oss << "   A  B  C  D  E  F  G  H";
     return oss.str();
+}
+
+void Checkerboard::saveToFile(const std::string& filename) const {
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+        return;
+    }
+
+    MovesPile history = _movesHistory;
+    std::vector<MoveRecord> temp;
+
+    // stack --> vector (reverse order)
+    while (!history.empty()) {
+        temp.push_back(history.top());
+        history.pop();
+    }
+
+    // write
+    for (auto it = temp.rbegin(); it != temp.rend(); ++it) {
+        file << (it->turnBlack ? "BLACK" : "WHITE") << ","
+             << it->from.toString() << ","
+             << it->to.toString() << ","
+             << "\n";
+    }
+}
+
+void Checkerboard::loadFromFile(const std::string& filename) {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        return;
+    }
+
+    std::string turn, from, to;
+
+    while (std::getline(file, turn, ',')) {
+        std::getline(file, from, ',');
+        std::getline(file, to);
+
+        play(Position(from), Position(to), turn == "BLACK");
+    }
 }

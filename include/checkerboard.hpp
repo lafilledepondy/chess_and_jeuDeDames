@@ -1,6 +1,5 @@
 #pragma once
 
-#include <iostream>
 #include <string>
 
 #include "plateau.hpp"
@@ -31,4 +30,6 @@ class Checkerboard: public Plateau {
         bool canUndo() const;
         std::string toString() const;
         std::string toUnicodeString() const;
+        void loadFromFile(const std::string& filename);
+        void saveToFile(const std::string& filename) const;
 };
