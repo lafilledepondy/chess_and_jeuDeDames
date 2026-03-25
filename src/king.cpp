@@ -8,7 +8,7 @@ bool King::isValidMove(const Position &start_pos, const Position &end_pos, bool 
     const int deltaY = end_pos.getY() - start_pos.getY();
     int dx = abs(deltaX);
     int dy = abs(deltaY);
-    Piece* target = board->getPiece(end_pos);
+    const Piece* target = board->getPiece(end_pos);
 
     // no move
     if (dx == 0 && dy == 0) return false;

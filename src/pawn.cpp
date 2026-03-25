@@ -6,7 +6,7 @@ bool Pawn::isValidMove(const Position &start_pos, const Position &end_pos, bool 
     const int direction = getIsBlack() ? 1 : -1; // black: move down ; white: move up
     const int dx = end_pos.getX() - start_pos.getX();
     const int dy = end_pos.getY() - start_pos.getY();
-    Piece* target = board->getPiece(end_pos);
+    const Piece* target = board->getPiece(end_pos);
     
     // no move
     if (dx == 0 && dy == 0) return false;
@@ -40,7 +40,7 @@ bool Pawn::isValidMove(const Position &start_pos, const Position &end_pos, bool 
             return true;
         }
 
-        // TODO: en passant is it coded?
+        // TODO: en passant 
         // en passant requires last move tracking in Plateau
         // if (target == nullptr) {
         //     Position side(end_pos.getX(), start_pos.getY());
