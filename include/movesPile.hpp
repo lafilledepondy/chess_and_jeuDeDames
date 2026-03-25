@@ -31,7 +31,7 @@ class MovesPile {
         // ----------------------------------------------------------------------------
         // methods
         // ----------------------------------------------------------------------------        
-        std::string backMove(); 
+        std::string backMove() const;
         bool empty() const;
         std::size_t size() const;
         void clear();
@@ -39,5 +39,4 @@ class MovesPile {
         const MoveRecord& top() const;
         MoveRecord pop();
         bool canUndo() const;
-        bool undoLastMove(Plateau& board);     
 };

@@ -1,10 +1,27 @@
 #include "checkerboard.hpp"
 
+#include <cmath>
+
+namespace {
+bool getFirstMoveFlag(const Piece* piece) {
+    if (const Pawn* pawn = dynamic_cast<const Pawn*>(piece)) return pawn->firstMove;
+    if (const Rook* rook = dynamic_cast<const Rook*>(piece)) return rook->firstMove;
+    if (const King* king = dynamic_cast<const King*>(piece)) return king->firstMove;
+    return false;
+}
+
+void setFirstMoveFlag(Piece* piece, bool value) {
+    if (Pawn* pawn = dynamic_cast<Pawn*>(piece)) pawn->firstMove = value;
+    if (Rook* rook = dynamic_cast<Rook*>(piece)) rook->firstMove = value;
+    if (King* king = dynamic_cast<King*>(piece)) king->firstMove = value;
+}
+}
+
 /*
 x <>
 y ^
         0 1  2  3  4  5  6  7  8           
-    0     A  B  C  D  E  F  G  H
+    0     
     1   8 Ro Ho Bi Qu Ki Bi Ho Ro       <> BLACK
     2   7 Pa Pa Pa Pa Pa Pa Pa Pa
     3   6 . . . . . . . . . . . .
@@ -13,9 +30,68 @@ y ^
     6   3 . . . . . . . . . . . .
     7   2 pa pa pa pa pa pa pa pa       <> WHITE
     8   1 ro ho bi qu ki bi ho ro
+           A  B  C  D  E  F  G  H
 */
 
 Checkerboard::Checkerboard():Plateau(8, 8) {}
+
+void Checkerboard::play(const Position &start_pos, const Position &end_pos, bool turnBlack) {
+    Piece* movedPieceBefore = getPiece(start_pos);
+    Piece* capturedPieceBefore = getPiece(end_pos);
+    const bool movedPieceWasFirstMove = getFirstMoveFlag(movedPieceBefore);
+
+    Plateau::play(start_pos, end_pos, turnBlack);
+
+    MoveRecord record {
+        turnBlack,
+        start_pos,
+        end_pos,
+        movedPieceBefore,
+        capturedPieceBefore,
+        movedPieceWasFirstMove,
+        false,
+        nullptr
+    };
+
+    _movesHistory.push(record);
+}
+
+bool Checkerboard::canUndo() const {
+    return _movesHistory.canUndo();
+}
+
+bool Checkerboard::undoLastMove() {
+    if (!_movesHistory.canUndo()) return false;
+
+    MoveRecord move = _movesHistory.pop();
+    Piece* movedPiece = getPiece(move.to);
+    if (movedPiece == nullptr) return false;
+
+    movePiece(move.to, move.from);
+
+    if (King* king = dynamic_cast<King*>(getPiece(move.from))) {
+        if (move.from.getY() == move.to.getY() && std::abs(move.to.getX() - move.from.getX()) == 2) {
+            const int direction = (move.to.getX() > move.from.getX()) ? 1 : -1;
+            const Position rookFrom(move.from.getX() + direction, move.from.getY());
+            const Position rookTo(direction > 0 ? getWidth() : 1, move.from.getY());
+
+            Piece* rookPiece = getPiece(rookFrom);
+            movePiece(rookFrom, rookTo);
+            setFirstMoveFlag(rookPiece, true);
+        }
+        setFirstMoveFlag(king, move.movedPieceWasFirstMove);
+    } else {
+        setFirstMoveFlag(getPiece(move.from), move.movedPieceWasFirstMove);
+    }
+
+    addPiece(move.capturedPiece, move.to);
+
+    if (move.wasPromotion && move.promotionOldPiece != nullptr) {
+        addPiece(move.promotionOldPiece, move.from);
+    }
+
+    return true;
+}
        
 void Checkerboard::initialConditions() { 
     // PAWN    

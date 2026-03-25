@@ -23,6 +23,15 @@ void chessMain() {
         if (input == "quit") {
             break;
         }
+        if (input == "undo") {
+            if (cb.undoLastMove()) {
+                turnBlack = !turnBlack;
+                std::cout << "Last move undone.\n\n";
+            } else {
+                std::cout << "No move to undo.\n";
+            }
+            continue;
+        }
 
         std::istringstream iss(input);
         std::string startStr, endStr;
@@ -58,15 +67,15 @@ int main() {
     std::cout << "|                       CHESS & CHECKERS                       |" << std::endl;
     std::cout << "+==============================================================+" << std::endl;
 
-    // chessMain();
+    chessMain();
 
-    Checkerboard cb;
+    // Checkerboard cb;
 
-    cb.initialConditions();
+    // cb.initialConditions();
     // cb.play(Position("A2"), Position("A4"), true);
     
-    std::cout << cb.toString() << std::endl;
-    std::cout << cb.toUnicodeString() << std::endl;
+    // std::cout << cb.toString() << std::endl;
+    // std::cout << cb.toUnicodeString() << std::endl;
 
     return 0;
 }
