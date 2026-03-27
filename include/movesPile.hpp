@@ -14,6 +14,7 @@ struct MoveRecord {
     Position to;
     Piece* movedPiece;
     Piece* capturedPiece;
+    Position capturedPosition;
 
     bool movedPieceWasFirstMove;
     bool wasPromotion;

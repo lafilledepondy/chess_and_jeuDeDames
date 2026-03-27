@@ -41,5 +41,7 @@ class Plateau {
         // ----------------------------------------------------------------------------
         bool isInside(const Position &pos) const;
         Piece *getPiece(const Position &pos) const;
+        virtual bool canEnPassantCapture(const Position &start_pos, const Position &end_pos) const;
+        virtual Position getEnPassantCapturedPosition(const Position &start_pos, const Position &end_pos) const;
         void play(const Position &start_pos, const Position &end_pos, bool turnBlack);
 };

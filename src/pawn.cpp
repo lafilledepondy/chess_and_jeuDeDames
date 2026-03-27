@@ -40,20 +40,17 @@ bool Pawn::isValidMove(const Position &start_pos, const Position &end_pos, bool 
             return true;
         }
 
-        // TODO: en passant 
-        // en passant requires last move tracking in Plateau
-        // if (target == nullptr) {
-        //     Position side(end_pos.getX(), start_pos.getY());
-        //     Piece* sidePawn = board->getPiece(side);
+        if (target == nullptr) {
+            Position side(end_pos.getX(), start_pos.getY());
+            const Piece* sidePawn = board->getPiece(side);
 
-        //     if (sidePawn != nullptr &&
-        //         sidePawn->getName() == "pawn" &&
-        //         sidePawn->getIsBlack() != getIsBlack() &&
-        //         board->wasLastMoveDoubleStep(side)) {
-
-        //         return true;
-        //     }
-        // }
+            if (sidePawn != nullptr &&
+                dynamic_cast<const Pawn*>(sidePawn) != nullptr &&
+                sidePawn->getIsBlack() != getIsBlack() &&
+                board->canEnPassantCapture(start_pos, end_pos)) {
+                return true;
+            }
+        }
     }
 
 

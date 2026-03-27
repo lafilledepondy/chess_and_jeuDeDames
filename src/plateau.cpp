@@ -52,6 +52,18 @@ Piece * Plateau::getPiece(const Position &pos) const {
     return plateau_vec[pos.getY()][pos.getX()];
 }
 
+bool Plateau::canEnPassantCapture(const Position &start_pos, const Position &end_pos) const {
+    (void)start_pos;
+    (void)end_pos;
+    return false;
+}
+
+Position Plateau::getEnPassantCapturedPosition(const Position &start_pos, const Position &end_pos) const {
+    (void)start_pos;
+    (void)end_pos;
+    return Position(0, 0);
+}
+
 void Plateau::play(const Position &start_pos, const Position &end_pos, bool turnBlack) {
     Piece *piece_start = getPiece(start_pos); 
     Piece *piece_end = getPiece(end_pos); 
@@ -68,6 +80,17 @@ void Plateau::play(const Position &start_pos, const Position &end_pos, bool turn
     bool isCapture = (piece_end != nullptr);   
     if (!piece_start->isValidMove(start_pos, end_pos, isCapture, this)) {
         throw InvalidMoveException(5, "invalid move by the piece.", 2);
+    }
+
+    // En passant captures an adjacent pawn on a different square than end_pos.
+    if (dynamic_cast<Pawn*>(piece_start) != nullptr &&
+        piece_end == nullptr &&
+        std::abs(end_pos.getX() - start_pos.getX()) == 1 &&
+        canEnPassantCapture(start_pos, end_pos)) {
+        const Position capturedPos = getEnPassantCapturedPosition(start_pos, end_pos);
+        if (isInside(capturedPos)) {
+            addPiece(nullptr, capturedPos);
+        }
     }
 
     // Detect castling before moving pieces so we can move rook too

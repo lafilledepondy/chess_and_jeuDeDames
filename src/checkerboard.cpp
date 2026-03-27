@@ -6,19 +6,20 @@
 #include <sstream>
 #include <vector>
 
+// to avoid code duplication for firstMove flag in Pawn;Rook; King
 namespace {
-bool getFirstMoveFlag(const Piece* piece) {
-    if (const Pawn* pawn = dynamic_cast<const Pawn*>(piece)) return pawn->firstMove;
-    if (const Rook* rook = dynamic_cast<const Rook*>(piece)) return rook->firstMove;
-    if (const King* king = dynamic_cast<const King*>(piece)) return king->firstMove;
-    return false;
-}
+    bool getFirstMoveFlag(const Piece* piece) {
+        if (const Pawn* pawn = dynamic_cast<const Pawn*>(piece)) return pawn->firstMove;
+        if (const Rook* rook = dynamic_cast<const Rook*>(piece)) return rook->firstMove;
+        if (const King* king = dynamic_cast<const King*>(piece)) return king->firstMove;
+        return false;
+    }
 
-void setFirstMoveFlag(Piece* piece, bool value) {
-    if (Pawn* pawn = dynamic_cast<Pawn*>(piece)) pawn->firstMove = value;
-    if (Rook* rook = dynamic_cast<Rook*>(piece)) rook->firstMove = value;
-    if (King* king = dynamic_cast<King*>(piece)) king->firstMove = value;
-}
+    void setFirstMoveFlag(Piece* piece, bool value) {
+        if (Pawn* pawn = dynamic_cast<Pawn*>(piece)) pawn->firstMove = value;
+        if (Rook* rook = dynamic_cast<Rook*>(piece)) rook->firstMove = value;
+        if (King* king = dynamic_cast<King*>(piece)) king->firstMove = value;
+    }
 }
 
 /*
@@ -38,9 +39,54 @@ y ^
 
 Checkerboard::Checkerboard():Plateau(8, 8) {}
 
+bool Checkerboard::canEnPassantCapture(const Position &start_pos, const Position &end_pos) const {
+    if (_movesHistory.empty()) {
+        return false;
+    }
+
+    const Piece* attacker = getPiece(start_pos);
+    if (attacker == nullptr || dynamic_cast<const Pawn*>(attacker) == nullptr) {
+        return false;
+    }
+
+    const MoveRecord& lastMove = _movesHistory.top();
+    if (dynamic_cast<const Pawn*>(lastMove.movedPiece) == nullptr) {
+        return false;
+    }
+
+    if (std::abs(lastMove.to.getY() - lastMove.from.getY()) != 2) {
+        return false;
+    }
+
+    const Position side(end_pos.getX(), start_pos.getY());
+    if (lastMove.to != side) {
+        return false;
+    }
+
+    return lastMove.turnBlack != attacker->getIsBlack();
+}
+
+Position Checkerboard::getEnPassantCapturedPosition(const Position &start_pos, const Position &end_pos) const {
+    if (!canEnPassantCapture(start_pos, end_pos)) {
+        return Position(0, 0);
+    }
+    return Position(end_pos.getX(), start_pos.getY());
+}
+
 void Checkerboard::play(const Position &start_pos, const Position &end_pos, bool turnBlack) {
     Piece* movedPieceBefore = getPiece(start_pos);
     Piece* capturedPieceBefore = getPiece(end_pos);
+    Position capturedPositionBefore = end_pos;
+
+    if (capturedPieceBefore == nullptr &&
+        dynamic_cast<Pawn*>(movedPieceBefore) != nullptr &&
+        canEnPassantCapture(start_pos, end_pos)) {
+        capturedPositionBefore = getEnPassantCapturedPosition(start_pos, end_pos);
+        if (isInside(capturedPositionBefore)) {
+            capturedPieceBefore = getPiece(capturedPositionBefore);
+        }
+    }
+
     const bool movedPieceWasFirstMove = getFirstMoveFlag(movedPieceBefore);
 
     Plateau::play(start_pos, end_pos, turnBlack);
@@ -51,6 +97,7 @@ void Checkerboard::play(const Position &start_pos, const Position &end_pos, bool
         end_pos,
         movedPieceBefore,
         capturedPieceBefore,
+        capturedPositionBefore,
         movedPieceWasFirstMove,
         false,
         nullptr
@@ -87,7 +134,7 @@ bool Checkerboard::undoLastMove() {
         setFirstMoveFlag(getPiece(move.from), move.movedPieceWasFirstMove);
     }
 
-    addPiece(move.capturedPiece, move.to);
+    addPiece(move.capturedPiece, move.capturedPosition);
 
     if (move.wasPromotion && move.promotionOldPiece != nullptr) {
         addPiece(move.promotionOldPiece, move.from);
@@ -303,7 +350,7 @@ std::vector<Checkerboard::ReplayMove> Checkerboard::readMovesFromFile(const std:
             });
         }
         catch (const std::exception&) {
-            // Ignore malformed lines and continue parsing the rest of the replay file.
+            // ignore malformed lines
             continue;
         }
     }

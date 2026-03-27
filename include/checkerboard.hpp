@@ -33,6 +33,8 @@ class Checkerboard: public Plateau {
         // ----------------------------------------------------------------------------         
         void initialConditions();
         void play(const Position &start_pos, const Position &end_pos, bool turnBlack);
+        bool canEnPassantCapture(const Position &start_pos, const Position &end_pos) const override;
+        Position getEnPassantCapturedPosition(const Position &start_pos, const Position &end_pos) const override;
         bool undoLastMove();
         bool canUndo() const;
         std::string toString() const;

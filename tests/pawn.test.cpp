@@ -93,3 +93,22 @@ TEST(PawnTest, ForwardBlockedThrows) {
         InvalidMoveException
     );
 }
+
+TEST(PawnTest, EnPassantCaptureSucceeds) {
+    Checkerboard cb;
+    cb.initialConditions();
+
+    cb.play(Position("E7"), Position("E5"), false);
+    cb.play(Position("A2"), Position("A3"), true);
+    cb.play(Position("E5"), Position("E4"), false);
+    cb.play(Position("D2"), Position("D4"), true);
+
+    ASSERT_NO_THROW(cb.play(Position("E4"), Position("D3"), false));
+
+    EXPECT_EQ(cb.getPiece(Position("E4")), nullptr);
+    EXPECT_EQ(cb.getPiece(Position("D4")), nullptr);
+
+    Piece* landing = cb.getPiece(Position("D3"));
+    ASSERT_NE(landing, nullptr);
+    EXPECT_FALSE(landing->getIsBlack());
+}

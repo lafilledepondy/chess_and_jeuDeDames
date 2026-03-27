@@ -53,3 +53,25 @@ TEST(CheckerboardUndoTest, UndoCaptureRestoresCapturedPiece) {
     EXPECT_EQ(restoredAttacker, attackerBefore);
     EXPECT_EQ(restoredCaptured, victimBefore);
 }
+
+TEST(CheckerboardUndoTest, UndoEnPassantRestoresCapturedPawn) {
+    Checkerboard cb;
+    cb.initialConditions();
+
+    cb.play(Position("E7"), Position("E5"), false);
+    cb.play(Position("A2"), Position("A3"), true);
+    cb.play(Position("E5"), Position("E4"), false);
+    cb.play(Position("D2"), Position("D4"), true);
+
+    Piece* attackerBefore = cb.getPiece(Position("E4"));
+    Piece* victimBefore = cb.getPiece(Position("D4"));
+    ASSERT_NE(attackerBefore, nullptr);
+    ASSERT_NE(victimBefore, nullptr);
+
+    ASSERT_NO_THROW(cb.play(Position("E4"), Position("D3"), false));
+    ASSERT_TRUE(cb.undoLastMove());
+
+    EXPECT_EQ(cb.getPiece(Position("E4")), attackerBefore);
+    EXPECT_EQ(cb.getPiece(Position("D4")), victimBefore);
+    EXPECT_EQ(cb.getPiece(Position("D3")), nullptr);
+}
