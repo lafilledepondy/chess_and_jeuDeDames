@@ -12,7 +12,7 @@
 
 Plateau::Plateau(int height, int width) {
     plateau_vec.resize(height + 1);
-
+    // +1 => to use 1-based indexing
     for (int i_height=0; i_height<=height; i_height++) {
         plateau_vec[i_height].resize(width + 1, nullptr);
     }
@@ -30,22 +30,24 @@ void Plateau::addPiece(Piece * pi, const Position &pos){
 }
 
 int Plateau::getHeight() const {
-    return plateau_vec.size() - 1;
+    return plateau_vec.size() - 1; // -1 undo the 1-based indexing
 }
 
 int Plateau::getWidth() const {
     if (plateau_vec.empty()) {
         return 0;
     }
-    return plateau_vec[0].size() - 1;
+    return plateau_vec[0].size() - 1; // -1 undo the 1-based indexing
 }
 
 bool Plateau::isInside(const Position &pos) const {
+    // check bounds limits
     return pos.getX() > 0 && pos.getX() <= getWidth() &&
             pos.getY() > 0 && pos.getY() <= getHeight() ;
 }
 
 Piece * Plateau::getPiece(const Position &pos) const {
+    // not inside throw InvalidMoveException 
     if (!isInside(pos)) {
         throw InvalidMoveException(1, "Outside of the board.", 3);
     }
@@ -67,39 +69,32 @@ Position Plateau::getEnPassantCapturedPosition(const Position &start_pos, const 
 void Plateau::play(const Position &start_pos, const Position &end_pos, bool turnBlack) {
     Piece *piece_start = getPiece(start_pos); 
     Piece *piece_end = getPiece(end_pos); 
-
-    if (piece_start == nullptr) {
-        throw InvalidMoveException(2, "`start_pos` is empty.", 3);
-    }
-    if (piece_start->getIsBlack() != turnBlack) {
-        throw InvalidMoveException(3, "`start_pos` is another color.", 3);
-    }
-    if (piece_end != nullptr && piece_start->getIsBlack() == piece_end->getIsBlack()) {
-        throw InvalidMoveException(4, "`end_pos` has my color.", 3);
-    }
     bool isCapture = (piece_end != nullptr);   
-    if (!piece_start->isValidMove(start_pos, end_pos, isCapture, this)) {
-        throw InvalidMoveException(5, "invalid move by the piece.", 2);
-    }
 
-    // En passant captures an adjacent pawn on a different square than end_pos.
+    // handling errors related to the move before actually moving pieces
+    if (piece_start == nullptr) {throw InvalidMoveException(2, "`start_pos` is empty.", 3);}
+    if (piece_start->getIsBlack() != turnBlack) {throw InvalidMoveException(3, "`start_pos` is another color.", 3);}
+    if (piece_end != nullptr && piece_start->getIsBlack() == piece_end->getIsBlack()) {throw InvalidMoveException(4, "`end_pos` has my color.", 3);}
+    if (!piece_start->isValidMove(start_pos, end_pos, isCapture, this)) {throw InvalidMoveException(5, "invalid move by the piece.", 2);}
+
+    // handle en passant capture 
     if (dynamic_cast<Pawn*>(piece_start) != nullptr &&
         piece_end == nullptr &&
         std::abs(end_pos.getX() - start_pos.getX()) == 1 &&
         canEnPassantCapture(start_pos, end_pos)) {
         const Position capturedPos = getEnPassantCapturedPosition(start_pos, end_pos);
+
         if (isInside(capturedPos)) {
             addPiece(nullptr, capturedPos);
         }
     }
-
-    // Detect castling before moving pieces so we can move rook too
+    
     bool isCastling = false;
     Position rookStart(1, 1);
     Position rookEnd(1, 1);
     Rook* castlingRook = nullptr;
-
     King* movingKing = dynamic_cast<King*>(piece_start);
+    // detect castling move 
     if (movingKing != nullptr && start_pos.getY() == end_pos.getY() && std::abs(end_pos.getX() - start_pos.getX()) == 2) {
         const int direction = (end_pos.getX() > start_pos.getX()) ? 1 : -1;
         rookStart = Position(direction > 0 ? getWidth() : 1, start_pos.getY());
@@ -114,18 +109,13 @@ void Plateau::play(const Position &start_pos, const Position &end_pos, bool turn
 
     movePiece(start_pos, end_pos);
 
+    // if castling => move the rook as well
     if (isCastling) {
         movePiece(rookStart, rookEnd);
         castlingRook->firstMove = false;
     }
-
-    if (Pawn* pawn = dynamic_cast<Pawn*>(piece_start)) {
-        pawn->firstMove = false;
-    }
-    if (Rook* rook = dynamic_cast<Rook*>(piece_start)) {
-        rook->firstMove = false;
-    }
-    if (King* king = dynamic_cast<King*>(piece_start)) {
-        king->firstMove = false;
-    }
+    // update firstMove 
+    if (Pawn* pawn = dynamic_cast<Pawn*>(piece_start)) {pawn->firstMove = false;}
+    if (Rook* rook = dynamic_cast<Rook*>(piece_start)) {rook->firstMove = false;}
+    if (King* king = dynamic_cast<King*>(piece_start)) {king->firstMove = false;}
 }

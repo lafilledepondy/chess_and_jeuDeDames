@@ -80,9 +80,11 @@ void Checkerboard::play(const Position &start_pos, const Position &end_pos, bool
     Piece* capturedPieceBefore = getPiece(end_pos);
     Position capturedPositionBefore = end_pos;
 
+    // en passant capture check
     if (capturedPieceBefore == nullptr &&
         dynamic_cast<Pawn*>(movedPieceBefore) != nullptr &&
         canEnPassantCapture(start_pos, end_pos)) {
+
         capturedPositionBefore = getEnPassantCapturedPosition(start_pos, end_pos);
         // en passant capture handling
         if (isInside(capturedPositionBefore)) {
@@ -90,9 +92,11 @@ void Checkerboard::play(const Position &start_pos, const Position &end_pos, bool
         }
     }
 
+    // execute the move
     const bool movedPieceWasFirstMove = getFirstMoveFlag(movedPieceBefore);
     Plateau::play(start_pos, end_pos, turnBlack);
 
+    // struct to record
     MoveRecord record {
         turnBlack,
         start_pos,
@@ -104,7 +108,7 @@ void Checkerboard::play(const Position &start_pos, const Position &end_pos, bool
         false,
         nullptr
     };
-
+    // to save the move in history 
     _movesHistory.push(record);
 }
 
@@ -113,14 +117,16 @@ bool Checkerboard::canUndo() const {
 }
 
 bool Checkerboard::undoLastMove() {
+    // mo move to undo
     if (!_movesHistory.canUndo()) return false;
 
     MoveRecord move = _movesHistory.pop();
     Piece* movedPiece = getPiece(move.to);
+    // handling in case error: piece is missing BUT not expected
     if (movedPiece == nullptr) return false;
 
-    movePiece(move.to, move.from);
-
+    movePiece(move.to, move.from); // back to original position ; undid move
+    // if castling happened 
     if (King* king = dynamic_cast<King*>(getPiece(move.from))) {
         if (move.from.getY() == move.to.getY() && std::abs(move.to.getX() - move.from.getX()) == 2) {
             const int direction = (move.to.getX() > move.from.getX()) ? 1 : -1;
@@ -132,12 +138,13 @@ bool Checkerboard::undoLastMove() {
             setFirstMoveFlag(rookPiece, true);
         }
         setFirstMoveFlag(king, move.movedPieceWasFirstMove);
-    } else {
+    } else { // pawn or rook
         setFirstMoveFlag(getPiece(move.from), move.movedPieceWasFirstMove);
     }
-
+    // restored the piece on checkboard
     addPiece(move.capturedPiece, move.capturedPosition);
 
+    // handle is promotion
     if (move.wasPromotion && move.promotionOldPiece != nullptr) {
         addPiece(move.promotionOldPiece, move.from);
     }
@@ -192,8 +199,8 @@ std::string Checkerboard::toString() const {
     oss << "\n" ;
     for (int x = 0; x <= getWidth(); x++) {
         for (int y = 0; y <= getHeight(); y++) {
-            if (x==0 && y==0) {
-                oss << " ";
+            if (x==0 && y==0) { // [0][0]
+                oss << " "; 
             }
             else if (x!=0 && y==0) { // [*][0]
                 oss << std::to_string(x) << " ";
@@ -201,7 +208,7 @@ std::string Checkerboard::toString() const {
             else if (x==0 && y!=0) { /// [0][*]
                 oss << " " <<char('A' + y - 1) << " ";
             }
-            else if (plateau_vec[x][y] != nullptr) {
+            else if (plateau_vec[x][y] != nullptr) { // [*][*] with piece
                 oss << plateau_vec[x][y]->toString() << " ";
             }
             else {
@@ -215,6 +222,7 @@ std::string Checkerboard::toString() const {
 }
 
 std::string Checkerboard::toUnicodeString() const {
+    // same as toString but with Unicode characters
     std::ostringstream oss;
     oss << "\n";
     for (int x = 0; x <= getWidth(); x++) {
@@ -243,6 +251,7 @@ std::string Checkerboard::toUnicodeString() const {
 
 void Checkerboard::saveToFile(const std::string& filename) const {
     std::ofstream file(filename);
+    // file open error handling
     if (!file.is_open()) {
         return;
     }
@@ -286,6 +295,7 @@ void Checkerboard::saveToFile(const std::string& filename) const {
 }
 
 std::vector<Checkerboard::ReplayMove> Checkerboard::readMovesFromFile(const std::string& filename) const {
+    // same as saveToFile but in reverse order and with error handling for malformed lines
     std::vector<ReplayMove> moves;
     std::ifstream file(filename);
     if (!file.is_open()) {
@@ -361,6 +371,7 @@ std::vector<Checkerboard::ReplayMove> Checkerboard::readMovesFromFile(const std:
 }
 
 void Checkerboard::loadFromFile(const std::string& filename) {
+    // replay move by move 
     for (const ReplayMove& move : readMovesFromFile(filename)) {
         play(move.from, move.to, move.turnBlack);
     }
