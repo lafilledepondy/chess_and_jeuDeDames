@@ -10,22 +10,26 @@ bool Dame::isValidMove(const Position &start_pos, const Position &end_pos, bool 
 	const int absDx = std::abs(dx);
 	const int absDy = std::abs(dy);
 
-	// end_pos empty.
-	if (board->getPiece(end_pos) != nullptr) {
+	if (dx == 0 && dy == 0) {
 		return false;
 	}
 
-	// One-step diagonal move in any direction.
-	if (absDx == 1 && absDy == 1) {
-		return true;
+	if (absDx != absDy) {
+		return false;
 	}
 
-	// Capture jump: exactly two diagonal squares over an opponent piece.
-	if (absDx == 2 && absDy == 2) {
-		const Position middle(start_pos.getX() + dx / 2, start_pos.getY() + dy / 2);
-		const Piece* middlePiece = board->getPiece(middle);
-		return middlePiece != nullptr && middlePiece->getIsBlack() != getIsBlack();
+	const int stepX = (dx > 0) ? 1 : -1;
+	const int stepY = (dy > 0) ? 1 : -1;
+	int x = start_pos.getX() + stepX;
+	int y = start_pos.getY() + stepY;
+
+	while (x != end_pos.getX() && y != end_pos.getY()) {
+		if (board->getPiece(Position(x, y)) != nullptr) {
+			return false;
+		}
+		x += stepX;
+		y += stepY;
 	}
 
-	return false;
+	return true;
 }

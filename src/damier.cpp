@@ -57,6 +57,7 @@ void Damier::play(const Position &start_pos, const Position &end_pos, bool turnB
         addPiece(nullptr, jumpCapturedPos);
     }
 
+    // struct to record
     MoveRecord record {
         turnBlack,
         start_pos,
