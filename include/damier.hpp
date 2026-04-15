@@ -11,6 +11,8 @@ class Damier: public Plateau {
     private:
         MovesPile _movesHistory;
 
+        void promotePawnIfNeeded(const Position &end_pos, MoveRecord &record);
+
     public:
         struct ReplayMove {
             bool turnBlack;

@@ -8,6 +8,24 @@
 
 Damier::Damier():Plateau(10, 10) {}
 
+void Damier::promotePawnIfNeeded(const Position &end_pos, MoveRecord &record) {
+    Piece* piece = getPiece(end_pos);
+    Pion* pawn = dynamic_cast<Pion*>(piece);
+    if (pawn == nullptr) {
+        return;
+    }
+
+    const bool reachesLastRow = (pawn->getIsBlack() && end_pos.getY() == getHeight()) ||
+                                (!pawn->getIsBlack() && end_pos.getY() == 1);
+    if (!reachesLastRow) {
+        return;
+    }
+
+    record.wasPromotion = true;
+    record.promotionOldPiece = piece;
+    addPiece(new Dame(pawn->getIsBlack()), end_pos);
+}
+
 void Damier::play(const Position &start_pos, const Position &end_pos, bool turnBlack){
     Piece* movedPieceBefore = getPiece(start_pos);
     Piece* capturedPieceBefore = getPiece(end_pos);
@@ -39,7 +57,6 @@ void Damier::play(const Position &start_pos, const Position &end_pos, bool turnB
         addPiece(nullptr, jumpCapturedPos);
     }
 
-    // struct to record
     MoveRecord record {
         turnBlack,
         start_pos,
@@ -49,8 +66,12 @@ void Damier::play(const Position &start_pos, const Position &end_pos, bool turnB
         capturedPositionBefore,
         false, // no first move concept
         false,
-        nullptr
+        nullptr,
+        {}
     };
+
+    promotePawnIfNeeded(end_pos, record);
+
     // to save the move in history 
     _movesHistory.push(record);
 }

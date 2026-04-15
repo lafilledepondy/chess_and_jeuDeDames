@@ -3,6 +3,7 @@
 #include <stack>
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "piece.hpp"
 
@@ -19,6 +20,7 @@ struct MoveRecord {
     bool movedPieceWasFirstMove;
     bool wasPromotion;
     Piece* promotionOldPiece;
+    std::vector<Position> activatedDamePositions;
 };
 
 class MovesPile {
