@@ -3,6 +3,7 @@
 // ==============================================================================
 
 #include <iostream>
+#include <limits>
 #include <chrono>
 #include <sstream>
 #include <string>
@@ -146,16 +147,41 @@ void chessMain() {
     }
 }
 
+void jeuDeDamesMain() {
+    std::cout << "jeuDeDames" << std::endl;
+}
+
 int main() {
 
     for(int i = 0; i < 100; ++i) {
         std::cout << "\n";
     }    
     std::cout << "+==============================================================+" << std::endl;
-    std::cout << "|                       CHESS & CHECKERS                       |" << std::endl;
+    std::cout << "|                   CHESS & JEU DE DAMES                       |" << std::endl;
     std::cout << "+==============================================================+" << std::endl;
 
-    chessMain();
+    std::string gameInput;
+
+    while (true) {
+        std::cout << "Choose a game (chess | dames | quit):\n> ";
+        if (!(std::cin >> gameInput)) {
+            break; 
+        }
+        if (gameInput == "chess") {
+            std::cout << "=============== CHESS ===============" << std::endl;
+            chessMain();
+            break;
+        }
+        if (gameInput == "dames") {
+            std::cout << "=========== JEU DE DAMES ============" << std::endl;
+            jeuDeDamesMain();
+            break;
+        }
+        if (gameInput == "quit") {
+            break;
+        }
+        std::cout << "Unknown choice. Type: chess, dames, or quit.\n";
+    }
 
     // Checkerboard cb;
     // cb.initialConditions();
