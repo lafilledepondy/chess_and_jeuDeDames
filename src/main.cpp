@@ -8,8 +8,10 @@
 #include <cmath>
 #include <sstream>
 #include <string>
-#include <thread>
-#include <type_traits>
+#include <thread> // for chrono--> in sleep/auto replay
+#include <type_traits> // template logic (chess vs dames) 
+// template asked chatgpt; i didn't want to copy paste the same function for dame as chess, wanted to 
+// minise asked chatgpt how to do and it suggested templates.
 #include <vector>
 
 #include "checkerboard.hpp"
