@@ -51,6 +51,7 @@ void Damier::play(const Position &start_pos, const Position &end_pos, bool turnB
     }
 
     // execute the move
+    addCaptureScore(turnBlack, capturedPieceBefore);
     Plateau::play(start_pos, end_pos, turnBlack);
 
     if (isJumpCapture) {
@@ -92,6 +93,7 @@ bool Damier::undoLastMove() {
     movePiece(move.to, move.from); // back to original position ; undid move
 
     addPiece(move.capturedPiece, move.capturedPosition); // restored the piece on checkboard
+    undoCaptureScore(move.turnBlack, move.capturedPiece);
 
     // handle is promotion
     if (move.wasPromotion && move.promotionOldPiece != nullptr) {

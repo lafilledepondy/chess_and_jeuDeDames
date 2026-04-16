@@ -23,6 +23,8 @@ class Piece {
         // getters
         // ----------------------------------------------------------------------------     
         bool getIsBlack() const;
+        int getScoreValue() const;
+        bool isPriceless() const;
 
         // ----------------------------------------------------------------------------
         // abstract methods

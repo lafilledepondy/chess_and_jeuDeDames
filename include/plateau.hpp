@@ -12,6 +12,8 @@ class Plateau {
         // protected attribute
         // ----------------------------------------------------------------------------
         std::vector<std::vector<Piece *>> plateau_vec; // <> Piece *[][] Plateau
+        int blackScore;
+        int whiteScore;
 
         // ----------------------------------------------------------------------------
         // constructors
@@ -23,6 +25,8 @@ class Plateau {
         // ----------------------------------------------------------------------------
         void addPiece(Piece *pi, const Position &pos);
         void movePiece(const Position &start_pos, const Position &end_pos);
+        void addCaptureScore(bool capturerBlack, const Piece* capturedPiece);
+        void undoCaptureScore(bool capturerBlack, const Piece* capturedPiece);
 
     public:
         // ----------------------------------------------------------------------------
@@ -30,6 +34,8 @@ class Plateau {
         // ----------------------------------------------------------------------------
         int getHeight() const;
         int getWidth() const;
+        int getScore(bool forBlack) const;
+        int getMaterialAdvantage(bool forBlack) const;
 
         // ----------------------------------------------------------------------------
         // abstract methods

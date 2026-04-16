@@ -10,7 +10,7 @@
 #include "rook.hpp"
 #include "king.hpp"
 
-Plateau::Plateau(int height, int width) {
+Plateau::Plateau(int height, int width) : blackScore(0), whiteScore(0) {
     plateau_vec.resize(height + 1);
     // +1 => to use 1-based indexing
     for (int i_height=0; i_height<=height; i_height++) {
@@ -23,6 +23,36 @@ void Plateau::movePiece(const Position &start_pos, const Position &end_pos) {
 
     plateau_vec[end_pos.getY()][end_pos.getX()] = piece_start;
     plateau_vec[start_pos.getY()][start_pos.getX()] = nullptr;
+}
+
+void Plateau::addCaptureScore(bool capturerBlack, const Piece* capturedPiece) {
+    if (capturedPiece == nullptr || capturedPiece->isPriceless()) {
+        return;
+    }
+
+    const int value = capturedPiece->getScoreValue();
+    if (capturerBlack) {
+        blackScore += value;
+        whiteScore -= value;
+    } else {
+        whiteScore += value;
+        blackScore -= value;
+    }
+}
+
+void Plateau::undoCaptureScore(bool capturerBlack, const Piece* capturedPiece) {
+    if (capturedPiece == nullptr || capturedPiece->isPriceless()) {
+        return;
+    }
+
+    const int value = capturedPiece->getScoreValue();
+    if (capturerBlack) {
+        blackScore -= value;
+        whiteScore += value;
+    } else {
+        whiteScore -= value;
+        blackScore += value;
+    }
 }
 
 void Plateau::addPiece(Piece * pi, const Position &pos){
@@ -38,6 +68,14 @@ int Plateau::getWidth() const {
         return 0;
     }
     return plateau_vec[0].size() - 1; // -1 undo the 1-based indexing
+}
+
+int Plateau::getScore(bool forBlack) const {
+    return forBlack ? blackScore : whiteScore;
+}
+
+int Plateau::getMaterialAdvantage(bool forBlack) const {
+    return getScore(forBlack) - getScore(!forBlack);
 }
 
 bool Plateau::isInside(const Position &pos) const {

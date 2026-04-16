@@ -94,6 +94,7 @@ void Checkerboard::play(const Position &start_pos, const Position &end_pos, bool
 
     // execute the move
     const bool movedPieceWasFirstMove = getFirstMoveFlag(movedPieceBefore);
+    addCaptureScore(turnBlack, capturedPieceBefore);
     Plateau::play(start_pos, end_pos, turnBlack);
 
     // struct to record
@@ -143,6 +144,7 @@ bool Checkerboard::undoLastMove() {
     }
     // restored the piece on checkboard
     addPiece(move.capturedPiece, move.capturedPosition);
+    undoCaptureScore(move.turnBlack, move.capturedPiece);
 
     // handle is promotion
     if (move.wasPromotion && move.promotionOldPiece != nullptr) {

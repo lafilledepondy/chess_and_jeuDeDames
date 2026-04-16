@@ -1,9 +1,34 @@
 #include "piece.hpp"
 
+#include <limits>
+
 Piece::Piece(bool isBlack, std::string name) : _isBlack(isBlack), _name(name) {}
 
 bool Piece::getIsBlack() const {
     return _isBlack;
+}
+
+int Piece::getScoreValue() const {
+    if (_name == "pawn" || _name == "pion") {
+        return 1;
+    }
+    if (_name == "cavalier" || _name == "bishop" || _name == "dame") {
+        return 3;
+    }
+    if (_name == "rook") {
+        return 5;
+    }
+    if (_name == "queen") {
+        return 9;
+    }
+    if (_name == "king") {
+        return std::numeric_limits<int>::max();
+    }
+    return 0;
+}
+
+bool Piece::isPriceless() const {
+    return _name == "king";
 }
 
 std::string Piece::toString() const {
