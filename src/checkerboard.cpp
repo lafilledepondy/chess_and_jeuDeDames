@@ -20,6 +20,16 @@ namespace {
         if (Rook* rook = dynamic_cast<Rook*>(piece)) rook->firstMove = value;
         if (King* king = dynamic_cast<King*>(piece)) king->firstMove = value;
     }
+
+    constexpr const char* ANSI_RESET = "\x1b[0m";
+    constexpr const char* ANSI_LIGHT_SQUARE = "\x1b[48;5;180m"; //wood color
+    constexpr const char* ANSI_DARK_SQUARE = "\x1b[48;5;94m"; //bright wood color
+    constexpr const char* ANSI_WHITE_PIECE = "\x1b[38;5;231m"; // white
+    constexpr const char* ANSI_BLACK_PIECE = "\x1b[38;5;16m";  // black
+
+    std::string squareBackground(int x, int y) {
+        return ((x + y) % 2 == 0) ? ANSI_DARK_SQUARE : ANSI_LIGHT_SQUARE;
+    }
 }
 
 /*
@@ -239,10 +249,15 @@ std::string Checkerboard::toUnicodeString() const {
                 oss << " " <<char('A' + y - 1) << " ";
             }
             else if (plateau_vec[x][y] != nullptr) {
-                oss << " " << plateau_vec[x][y]->toUnicodeString() << " ";
+                const Piece* piece = plateau_vec[x][y];
+                const char* pieceColor = piece->getIsBlack() ? ANSI_BLACK_PIECE : ANSI_WHITE_PIECE;
+                oss << squareBackground(x, y)
+                    << pieceColor
+                    << " " << piece->toUnicodeString() << " "
+                    << ANSI_RESET;
             }
             else {
-                oss << " . ";
+                oss << squareBackground(x, y) << "   " << ANSI_RESET;
             }
         }
         oss << "\n";

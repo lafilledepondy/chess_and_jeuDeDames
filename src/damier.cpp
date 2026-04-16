@@ -6,6 +6,18 @@
 #include <sstream>
 #include <vector>
 
+namespace {
+    constexpr const char* ANSI_RESET = "\x1b[0m";
+    constexpr const char* ANSI_LIGHT_SQUARE = "\x1b[48;5;180m"; //wood color
+    constexpr const char* ANSI_DARK_SQUARE = "\x1b[48;5;94m"; //bright wood color
+    constexpr const char* ANSI_WHITE_PIECE = "\x1b[38;5;231m"; // white
+    constexpr const char* ANSI_BLACK_PIECE = "\x1b[38;5;16m";  // black
+
+    std::string squareBackground(int x, int y) {
+        return ((x + y) % 2 == 0) ? ANSI_DARK_SQUARE : ANSI_LIGHT_SQUARE;
+    }
+}
+
 Damier::Damier():Plateau(10, 10) {}
 
 void Damier::promotePawnIfNeeded(const Position &end_pos, MoveRecord &record) {
@@ -150,24 +162,33 @@ std::string Damier::toString() const {
 }
 
 std::string Damier::toUnicodeString() const {
+    // same as toString but with Unicode characters
     std::ostringstream oss;
     oss << "\n";
     for (int x = 0; x <= getWidth(); x++) {
         for (int y = 0; y <= getHeight(); y++) {
             if (x == 0 && y == 0) {
-                oss << "  ";
+                oss << "   ";
             }
-            else if (x != 0 && y == 0) {
-                oss << std::to_string(x) << " ";
+            else if (x != 0 && y == 0 && x!=10) {
+                oss << std::to_string(x) << "  ";
+            }
+            else if (x == 10 && y == 0) {
+                oss << std::to_string(x) << " ";                
             }
             else if (x == 0 && y != 0) {
                 oss << " " <<char('A' + y - 1) << " ";
             }
             else if (plateau_vec[x][y] != nullptr) {
-                oss << " " << plateau_vec[x][y]->toUnicodeString() << " ";
+                const Piece* piece = plateau_vec[x][y];
+                const char* pieceColor = piece->getIsBlack() ? ANSI_BLACK_PIECE : ANSI_WHITE_PIECE;
+                oss << squareBackground(x, y)
+                    << pieceColor
+                    << " " << piece->toUnicodeString() << " "
+                    << ANSI_RESET;
             }
             else {
-                oss << " . ";
+                oss << squareBackground(x, y) << "   " << ANSI_RESET;
             }
         }
         oss << "\n";
