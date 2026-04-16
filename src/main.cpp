@@ -96,10 +96,10 @@ void pseudoMain(BoardType& cb) {
     bool turnBlack = false; // white starts
 
     while (true) {
+        std::cout << "             Scoreboard\n";
+        std::cout << "White score : " << cb.getScore(false) ; 
+        std::cout << "     Black score : " << cb.getScore(true) << "\n";
         std::cout << cb.toUnicodeString() << std::endl;
-        std::cout << "Scoreboard\n";
-        std::cout << "  White score : " << cb.getScore(false) << "\n";
-        std::cout << "  Black score : " << cb.getScore(true) << "\n";
         std::cout << (turnBlack ? "Black" : "White") // options to chose for x player
                   << " move (D2 D4 | undo | save <file> | replay <file> | quit):\n> ";
         std::getline(std::cin, input);
